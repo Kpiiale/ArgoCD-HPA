@@ -8,7 +8,7 @@ spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: web-app             # Deployment que se escala
+    name: web-app
   minReplicas: 2
   maxReplicas: 5
   metrics:
@@ -17,4 +17,4 @@ spec:
         name: cpu
         target:
           type: Utilization
-          averageUtilization: 50   # objetivo: 50 % del CPU solicitado (requests)
+          averageUtilization: 50
