@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-app
+  labels:
+    app: web-app
+spec:
+  replicas: 2                 # réplicas iniciales (luego las controla el HPA)
+  selector:
+    matchLabels:
+      app: web-app            # debe coincidir con las labels del Pod
+  template:
+    metadata:
+      labels:
+        app: web-app
+    spec:
+      containers:
+        - name: web-app
+          image: registry.k8s.io/hpa-example   # app PHP/Apache que consume CPU en cada petición
+          ports:
+            - containerPort: 80
+              name: http
+          env:
+            - name: APP_VERSION
+              value: "v1"
+          resources:
+            requests:
+              cpu: 100m       # base para calcular el % de uso del HPA
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi

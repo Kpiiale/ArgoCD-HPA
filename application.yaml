@@ -1,0 +1,29 @@
+# Aplicación de Argo CD: se aplica UNA vez en el clúster (no va dentro de k8s/)
+# kubectl apply -f application.yaml -n argocd
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: web-app
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/TU_USUARIO/argocd-hpa-demo.git   # <-- cambia por tu repo
+    targetRevision: main
+    path: k8s                                                    # carpeta con los manifiestos
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: web-app
+  syncPolicy:
+    automated:
+      prune: true        # elimina del clúster lo que se borre del repo
+      selfHeal: true     # revierte cambios manuales hechos en el clúster
+    syncOptions:
+      - CreateNamespace=true
+      - RespectIgnoreDifferences=true
+  # El HPA cambia spec.replicas; sin esto Argo CD lo devolvería siempre a 2
+  ignoreDifferences:
+    - group: apps
+      kind: Deployment
+      jsonPointers:
+        - /spec/replicas
